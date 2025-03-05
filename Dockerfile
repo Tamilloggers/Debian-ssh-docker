@@ -27,10 +27,13 @@ RUN echo 'root:rootpassword' | chpasswd
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 # Expose SSH and HTTPS ports
-EXPOSE 22 80
+EXPOSE 22 443
+
+# Create the directory for health check HTML page
+RUN mkdir -p /var/www/html
 
 # Create a simple HTML page for health check (optional)
 RUN echo '<html><body><h1>Healthy</h1></body></html>' > /var/www/html/index.html
 
 # Start the SSH server and Python HTTPS server for health check
-CMD service ssh start && python3 -m http.server 80 --bind 0.0.0.0
+CMD service ssh start && python3 -m http.server 443 --bind 0.0.0.0
