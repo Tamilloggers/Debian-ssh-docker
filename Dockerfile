@@ -1,7 +1,7 @@
 # Use the latest Debian base image
 FROM debian:latest
 
-# Install SSH server, curl, sudo, nano, Python3, and other utilities
+# Install SSH server, curl, sudo, nano, Python3, OpenSSL, and unzip tools
 RUN apt-get update && apt-get install -y \
     openssh-server \
     sudo \
@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     python3 \
     python3-pip \
+    openssl \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Docker and Rclone
@@ -24,11 +26,11 @@ RUN echo 'root:rootpassword' | chpasswd
 # Allow SSH access to root
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# Expose SSH and HTTP (for health check)
+# Expose SSH and HTTPS ports
 EXPOSE 22 80
 
 # Create a simple HTML page for health check (optional)
 RUN echo '<html><body><h1>Healthy</h1></body></html>' > /var/www/html/index.html
 
-# Start the SSH server and a simple HTTP server for health check
-CMD service ssh start && python3 -m http.server 80
+# Start the SSH server and Python HTTPS server for health check
+CMD service ssh start && python3 -m http.server 80 --bind 0.0.0.0
